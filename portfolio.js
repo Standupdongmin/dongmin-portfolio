@@ -29,7 +29,7 @@
   function capabilityButton(label) {
     const capability = (profile.skillDetails || []).find(item => item.label === label);
     if (!capability) return escape(label);
-    return `<button type="button" class="capability-button" data-capability-open="${escape(capability.id)}" aria-label="${escape(label)} 활용 역량 보기" aria-haspopup="dialog" aria-controls="modal">${escape(label)}</button>`;
+    return `<button type="button" class="capability-button" data-capability-open="${escape(capability.id)}" aria-label="${escape(label)} 활용 역량 보기" aria-haspopup="dialog" aria-controls="modal">${escape(label)}<span class="capability-arrow" aria-hidden="true">↗</span></button>`;
   }
 
   function capabilityList(value) {
