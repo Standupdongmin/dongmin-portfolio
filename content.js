@@ -71,13 +71,19 @@ window.PORTFOLIO_CONTENT = {
         "id": "unreal-engine",
         "label": "Unreal Engine",
         "category": "게임 엔진",
-        "summary": "기획한 규칙을 엔진에서 구현하고 확인합니다.",
+        "summary": "AI 동작과 캐릭터 애니메이션, 무기 이펙트를 엔진에서 구성하고 실제 플레이로 확인합니다.",
         "items": [
+          "Retargeter로 기존 애니메이션을 캐릭터에 맞게 변환하고 자세·움직임 보정",
+          "ABP의 Event Graph·State Machine으로 캐릭터 상태 값을 갱신하고 이동·점프 전환 조건 구성",
+          "Niagara Particle System으로 무기별 발사 효과를 제작하고 파티클의 진행·생성·소멸 시점 조정",
+          "Cascade Particle System의 색상·크기·속도·수명·생성량·재생 시간 조정",
           "Behavior Tree·Blueprint로 AI 동작 구성",
           "Blackboard·Data Table로 조건과 데이터 연결",
           "Landscape·Modeling Mode로 지형과 더미맵 제작"
         ],
         "workIds": [
+          "weapon-animation",
+          "weapon-effects",
           "unreal-ai",
           "modeling-tools"
         ]
