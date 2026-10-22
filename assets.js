@@ -349,13 +349,13 @@ window.PORTFOLIO_ASSETS = {
       ]
     },
     "rpg-monster-ai": {
-      "src": "assets/media/monster-design.webp",
+      "src": "assets/media/monster-page-5.webp",
       "type": "image",
-      "alt": "RPG 일반 몬스터 범용 AI 기획서의 실제 FSM 설계 화면",
-      "sourcePage": 14,
-      "width": 836,
-      "height": 470,
-      "original": "assets/media/monster-design.webp",
+      "alt": "RPG 일반 몬스터 범용 AI 기획서 5쪽 · 전체 FSM 구조",
+      "sourcePage": 5,
+      "width": 1800,
+      "height": 1013,
+      "original": "assets/media/monster-page-5.webp",
       "gallery": [
         {
           "src": "assets/media/monster-page-3.webp",
@@ -367,11 +367,11 @@ window.PORTFOLIO_ASSETS = {
           "height": 900
         },
         {
-          "src": "assets/media/monster-page-5.webp",
-          "original": "assets/media/monster-page-5.webp",
+          "src": "assets/media/monster-page-15.webp",
+          "original": "assets/media/monster-page-15.webp",
           "type": "image",
-          "alt": "RPG 일반 몬스터 범용 AI 기획서 5쪽 · 전체 FSM 구조",
-          "sourcePage": 5,
+          "alt": "RPG 일반 몬스터 범용 AI 기획서 15쪽 · 스킬 선정 조건과 검사 순서",
+          "sourcePage": 15,
           "width": 1800,
           "height": 1013
         }
