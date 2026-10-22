@@ -301,7 +301,7 @@ dialog::backdrop { background: #000c; backdrop-filter: blur(6px); }
 .detail-content > .prose + .prose { margin-top: 26px; }
 .detail-section .prose > p + p { margin-top: 14px; }
 .detail-group + .detail-group { margin-top: 28px; }
-.detail-group h4 { font-size: 19px; font-weight: 700; line-height: 1.5; margin: 0 0 12px; }
+.detail-group h4 { color: var(--accent); font-size: 19px; font-weight: 700; line-height: 1.5; margin: 0 0 12px; }
 .detail-group-body { max-width: 680px; }
 .detail-group-body > .prose + .prose { margin-top: 20px; }
 .detail-section .detail-group-list { margin: 0; padding-left: 20px; list-style: disc; }
