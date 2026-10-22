@@ -29,7 +29,7 @@ window.PORTFOLIO_CONTENT = {
     "footer": ["서동민 · 게임 기획 포트폴리오", "시스템과 콘텐츠를 설계하고, 엔진에서 확인합니다."]
   },
   "ui": {
-    "categories": ["전체", "전투 제작", "레벨 기획", "시스템 기획", "구현과 도구"],
+    "categories": ["전체", "전투 제작", "레벨 기획", "시스템 기획", "콘텐츠 기획", "구현과 도구"],
     "allCategory": "전체",
     "detailLabels": ["마주한 문제", "대처와 해결", "발전과 배운 점"],
     "gameLabels": ["플레이에서 살펴본 요소", "선택과 규칙의 관계", "작업에 연결할 관점"],
@@ -47,6 +47,25 @@ window.PORTFOLIO_CONTENT = {
   },
   "profile": {
     "title": "게임 기획자 서동민",
+    "englishName": "Seo Dongmin",
+    "tagline": "동에 번쩍 서에 번쩍, 무슨 업무든 가능한",
+    "education": [
+      {"year": "2027", "description": "학점은행제 게임프로그래밍 공학사 학위 취득 예정"},
+      {"year": "2027", "description": "한국IT 전문학교 게임기획학과 졸업 예정"},
+      {"year": "2022", "description": "한국IT 전문학교 게임기획학과 입학"},
+      {"year": "2022", "description": "대천고등학교 졸업"}
+    ],
+    "projects": [
+      {"period": "2026 · 진행 중", "name": "The Battle Arena", "type": "교내 아레나형 FPS", "role": "시스템 기획 · 애니메이션 · 이펙트 · 사운드 · UI", "target": "battle-arena"},
+      {"period": "2025", "name": "Project Jump", "type": "교내 3D 플랫포머", "role": "레벨 디자인 · 몬스터 기획", "target": "project-jump"}
+    ],
+    "exhibition": {"year": "2026", "description": "G-STAR 전시 예정", "project": "The Battle Arena · FPS"},
+    "capabilities": [
+      {"label": "엔진", "value": "Unreal Engine · Unity"},
+      {"label": "언어", "value": "C# · C++"},
+      {"label": "AI 도구", "value": "ChatGPT · Claude · Gemini"}
+    ],
+    "tools": ["Blender", "3ds Max", "Photoshop", "PowerPoint", "Word", "Excel"],
     "paragraphs": [
       "게임의 규칙이 플레이어의 선택과 재미로 이어지는 과정을 설계합니다. 시스템과 레벨 기획에 더해, 애니메이션·이펙트·UI·사운드를 직접 다루며 게임을 만드는 흐름을 익혔습니다.",
       "The Battle Arena는 2026년 G-STAR 전시 예정인 교내 아레나형 FPS 프로젝트입니다. 시스템 기획과 전투 피드백, 무기 애니메이션·이펙트·사운드 작업에 참여했습니다. 2025년 교내 프로젝트인 Project Jump에서는 3D 플랫포머의 레벨 디자인과 콘텐츠 기획을 담당했습니다.",
@@ -125,7 +144,7 @@ window.PORTFOLIO_CONTENT = {
       "actions": [{"label": "기획서 내용 보기 ↓", "title": "RPG 일반 몬스터 범용 AI 설계", "detail": 1, "url": ""}, {"label": "설계 기준 보기 ▷", "title": "범용 AI의 공통 규칙과 예외", "detail": 2, "url": ""}]
     },
     {
-      "id": "guardian-requiem", "category": "시스템 기획", "eyebrow": "로스트아크 전투 기획 제안 · 34쪽", "title": "신규 가디언 기획", "subtitle": "엘버하스틱 레퀴엠",
+      "id": "guardian-requiem", "category": "콘텐츠 기획", "eyebrow": "로스트아크 콘텐츠 기획 제안 · 34쪽", "title": "신규 가디언 기획", "subtitle": "엘버하스틱 레퀴엠",
       "summary": "반복 토벌의 지루함과 기믹 피로를 함께 줄이기 위한 신규 가디언 제안입니다. 3~5분을 목표로 한 두 페이즈에 대응 보상과 개인 버프 경쟁을 구성했습니다.",
       "role": "2개 페이즈 · 견고함·광란 버프 · 15개 스킬 항목 · 전조와 대응", "art": "boss",
       "details": [

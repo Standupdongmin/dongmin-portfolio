@@ -1,108 +1,298 @@
-/* 화면 구조와 스타일은 HTML에, 수정할 내용은 content.js에 있습니다. */
+/* 문구는 content.js, 실제 이미지와 PDF 경로는 assets.js에서 관리합니다. */
 (() => {
   'use strict';
   const content = window.PORTFOLIO_CONTENT;
   if (!content) throw new Error('content.js를 불러오지 못했습니다. 파일 위치와 문법을 확인해 주세요.');
   const { site, ui, works, games, profile } = content;
+  const assets = window.PORTFOLIO_ASSETS || {};
+  const documents = assets.documents || {};
   const escape = value => String(value ?? '').replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char]);
-  const lines = values => values.map(escape).join('<br>');
-  const text = (selector, value) => { document.querySelector(selector).textContent = value; };
-  const html = (selector, value) => { document.querySelector(selector).innerHTML = value; };
-  function art(type){const colors={arena:'#d09b68',effect:'#f79451',hud:'#a5d089',jump:'#a7cb71',ai:'#8cae87',boss:'#b2a1d2'};let c=colors[type];let s='';if(type==='ai'){s='<path d="M130 80H470M300 80V135M120 135H480M120 135V190M300 135V190M480 135V190" fill="none" stroke="'+c+'" stroke-width="2"/>';[[230,50,'타깃 판단'],[50,190,'대기'],[230,190,'추격'],[410,190,'공격']].forEach(([x,y,t])=>s+='<rect x="'+x+'" y="'+y+'" width="140" height="45" fill="#29392a" stroke="'+c+'"/><text x="'+(x+70)+'" y="'+(y+29)+'" text-anchor="middle" fill="'+c+'" font-size="15">'+t+'</text>')}else if(type==='jump'){s='<path d="M60 215Q200 50 300 145T530 65" stroke="'+c+'" stroke-width="2" stroke-dasharray="7 7" fill="none"/>';[[50,220],[180,180],[310,150],[460,100]].forEach(([x,y],i)=>s+='<path d="M'+x+' '+y+'l60 -20 50 20 -60 20z" fill="'+c+'" opacity=".8"/><path d="M'+x+' '+y+'v30l50 20 60 -20v-30l-60 20z" fill="#394d31"/>');s+='<circle cx="490" cy="60" r="12" fill="#ff783c"/>'}else if(type==='boss'){s='<circle cx="300" cy="155" r="100" stroke="'+c+'" fill="none" stroke-dasharray="3 8"/><path d="M300 55L370 190H230Z" fill="#473a58" stroke="'+c+'"/><path d="M300 115L420 250H180Z" fill="'+c+'" opacity=".13"/><circle cx="300" cy="155" r="17" fill="'+c+'"/>'}else{s='<path d="M0 270L210 110H390L600 270M0 0L210 110M600 0L390 110M210 110V210H390V110" fill="none" stroke="'+c+'" opacity=".4"/><path d="M260 155H340M300 115V195" stroke="'+c+'"/><circle cx="300" cy="155" r="27" fill="none" stroke="'+c+'"/><path d="M375 280L340 215L380 190L440 215L470 280Z" fill="#5a6653" stroke="'+c+'"/>';if(type==='effect')s+='<path d="M345 205L305 175L330 168L290 132L358 174L347 150L378 190Z" fill="#ffad68"/>';if(type==='hud')s+='<rect x="30" y="235" width="150" height="8" fill="#abc881"/><text x="30" y="225" fill="#abc881" font-size="12">체력</text><text x="500" y="245" fill="#abc881" font-size="26">24 / 96</text>'}return '<svg viewBox="0 0 600 300" role="img" aria-label="작업 내용을 표현한 개념 그래픽"><defs><pattern id="g'+type+'" width="30" height="30" patternUnits="userSpaceOnUse"><path d="M30 0H0V30" fill="none" stroke="#77876a" opacity=".1"/></pattern></defs><rect width="600" height="300" fill="url(#g'+type+')"/>'+s+'</svg>'}
+  const number = value => String(value).padStart(2, '0');
+  const text = (selector, value) => { const node = document.querySelector(selector); if (node) node.textContent = value; };
+  const html = (selector, value) => { const node = document.querySelector(selector); if (node) node.innerHTML = value; };
+  const firstSentence = value => String(value || '').match(/^[\s\S]*?[.!?](?=\s|$)/)?.[0] || String(value || '');
+
+  function safeURL(value) {
+    if (typeof value !== 'string' || !value.trim()) return '';
+    try {
+      const parsed = new URL(value, document.baseURI);
+      const relativeFile = location.protocol === 'file:' && parsed.protocol === 'file:' && !/^(?:[a-z][a-z0-9+.-]*:|[\\/])/i.test(value);
+      if (parsed.protocol === 'https:' || (parsed.protocol === 'http:' && parsed.origin === location.origin) || relativeFile) return parsed.href;
+    } catch (_) { /* 잘못된 경로는 화면에 연결하지 않습니다. */ }
+    return '';
+  }
+
+  function mediaMarkup(media, fallbackTitle, eager = false) {
+    if (!media) return '';
+    const src = safeURL(media.src);
+    if (!src) return '';
+    const title = media.alt || fallbackTitle;
+    const original = safeURL(media.original) || src;
+    if (media.type === 'video') {
+      const poster = safeURL(media.poster);
+      return `<button type="button" class="media-trigger video-trigger" data-video-open="${escape(src)}" data-media-original="${escape(original)}" data-media-title="${escape(title)}" data-media-poster="${escape(poster)}" aria-label="${escape(title)} 영상 보기">${poster ? `<img class="media-image" src="${escape(poster)}" alt="${escape(title)}" width="1600" height="900" loading="${eager ? 'eager' : 'lazy'}" decoding="async">` : `<span class="video-label">${escape(title)}</span>`}<span class="media-expand">영상 보기 ▷</span></button>`;
+    }
+    return `<button type="button" class="media-trigger" data-image-open="${escape(src)}" data-media-original="${escape(original)}" data-media-title="${escape(title)}" aria-label="${escape(title)} 확대 보기"><img class="media-image" src="${escape(src)}" alt="${escape(title)}" width="${Number(media.width) || 1600}" height="${Number(media.height) || 900}" loading="${eager ? 'eager' : 'lazy'}" decoding="async"${eager ? ' fetchpriority="high"' : ''}><span class="media-expand" aria-hidden="true">↗</span></button>`;
+  }
+
+  function setMedia(selector, media, fallbackTitle, eager = false) {
+    const node = document.querySelector(selector);
+    if (!node) return;
+    const markup = mediaMarkup(media, fallbackTitle, eager);
+    node.hidden = !markup;
+    node.innerHTML = markup;
+  }
+
+  function documentLinks(doc, className = 'doc-actions') {
+    const url = safeURL(doc?.url);
+    if (!url) return '';
+    return `<div class="${className}"><a class="btn" href="${escape(url)}" target="_blank" rel="noopener noreferrer">PDF 원본 보기 ↗</a><a class="text-link" href="${escape(url)}" download>다운로드 ↓</a></div>`;
+  }
 
   document.title = site.title;
-  html('.brand', `${escape(site.name)}<i> / </i>${escape(site.role)}`);
-  document.querySelectorAll('nav .links a').forEach((node, i) => { node.textContent = site.navigation[i]; });
-  text('.hero .eyebrow', site.hero.eyebrow);
-  html('.hero h1', `${lines(site.hero.headline.slice(0, 2))}<br><em>${escape(site.hero.headline[2])}</em>`);
-  const introduction = site.hero.intro.map((line, i) => {
-    if (i !== 0 || !line.includes(site.name)) return escape(line);
-    return line.split(site.name).map(escape).join(`<b>${escape(site.name)}</b>`);
-  }).join('<br>');
-  html('.hero p', introduction);
-  html('.hero .actions a', `${escape(site.hero.primaryAction)} <span>↓</span>`);
-  text('.hero .actions button', site.hero.profileAction);
-  text('.arttag', site.hero.artTag);
-  html('.artfoot', `${escape(site.hero.artCaption)}<br><span class="tiny">${escape(site.hero.artNote)}</span>`);
-  document.querySelectorAll('.principles > div').forEach((node, i) => {
-    const principle = site.principles[i];
-    node.querySelector('span').textContent = principle.label;
-    node.querySelector('b').textContent = principle.title;
-    node.querySelector('p').textContent = principle.description;
+  text('.brand-name', site.name);
+  text('.brand-role', site.role);
+  setMedia('#hero-media', assets.hero || assets.projects?.battle, 'The Battle Arena 작업 화면', true);
+  setMedia('#featured-media', assets.projects?.battle, 'The Battle Arena 작업 화면');
+  setMedia('#jump-media', assets.projects?.jump, 'Project Jump 작업 화면');
+  const overviewURL = safeURL(documents.overview?.url);
+  ['#header-download', '#hero-download', '#footer-download'].forEach(selector => {
+    const link = document.querySelector(selector);
+    if (!link) return;
+    link.hidden = !overviewURL;
+    if (!overviewURL) return;
+    link.href = '#portfolio-overview';
   });
-  for (const section of ['works', 'games']) {
-    text(`#${section} .eyebrow`, site[section].eyebrow);
-    text(`#${section} h2`, site[section].title);
-    html(`#${section} .sectionhead > p`, lines(site[section].description));
+  const overviewSection = document.getElementById('portfolio-overview');
+  if (overviewSection) overviewSection.hidden = !overviewURL;
+  setMedia('#overview-preview', { src: documents.overview?.cover, alt: documents.overview?.title, width: 1280, height: 720 }, '포트폴리오 개요 표지');
+  text('#overview-file-meta', `포트폴리오 개요 · PDF · ${documents.overview?.pageCount || 21}쪽`);
+  if (overviewURL) html('#overview-actions', `<a class="btn primary" href="${escape(overviewURL)}" download="서동민_포트폴리오_개요.pdf">개요 PDF 다운로드 <span aria-hidden="true">↓</span></a><a class="text-link" href="${escape(overviewURL)}" target="_blank" rel="noopener noreferrer">PDF 원본 보기 ↗</a>`);
+
+  html('#battle-tasks', works.slice(0, 3).map((work, i) => `<article class="task-item"><div class="task-copy"><span class="eyebrow">${escape(work.eyebrow)}</span><h4>${escape(work.title)}</h4><p class="task-subtitle">${escape(work.subtitle)}</p></div><button type="button" class="text-link" data-work-open="${i}">제작 과정 보기 ↗</button></article>`).join(''));
+  html('#jump-actions', `<button type="button" class="btn primary" data-work-open="3">기획 과정 보기 ↗</button>`);
+  html('#document-grid', [4, 5].map((i, documentIndex) => {
+    const work = works[i];
+    const doc = documents[documentIndex === 0 ? 'monster' : 'guardian'];
+    const cover = typeof doc?.cover === 'string' ? { src: doc.cover, alt: doc.title || work.title } : doc?.cover;
+    const preview = mediaMarkup(cover, work.title);
+    return `<article class="doc-card">${preview ? `<div class="doc-preview">${preview}</div>` : ''}<div class="doc-content"><span class="doc-tag">개인 기획 · ${escape(work.category)}서</span><h3>${escape(work.title)}</h3><b class="work-subtitle">${escape(work.subtitle)}</b><p>${escape(work.summary)}</p><div class="doc-meta"><small>${escape(ui.roleLabel)}</small><span>${escape(work.role)}</span></div><div class="doc-actions"><button type="button" class="btn primary" data-work-open="${i}">기획 내용 열람 ↗</button></div>${documentLinks(doc)}</div></article>`;
+  }).join(''));
+  html('#skills-grid', works.slice(6).map((work, offset) => {
+    const i = offset + 6;
+    const media = assets.works?.[work.id];
+    const visual = mediaMarkup(media, work.title);
+    return `<article class="skill-item${visual ? '' : ' has-no-media'}">${visual ? `<figure class="skill-media">${visual}</figure>` : ''}<div class="skill-copy"><span class="eyebrow">${escape(work.eyebrow)}</span><h3>${escape(work.title)}</h3><p>${escape(work.summary)}</p><div class="role"><small>${escape(ui.roleLabel)}</small><span>${escape(work.role)}</span></div><button type="button" class="text-link" data-work-open="${i}">작업 과정 보기 ↗</button></div></article>`;
+  }).join(''));
+  text('#profile-kicker', profile.tagline);
+  html('#profile-summary', `<p class="profile-summary-text">${escape(profile.paragraphs[0])}</p>`);
+  const portrait = safeURL(assets.profile?.portrait);
+  html('#profile-identity', `<div class="profile-person">${portrait ? `<img class="profile-portrait" src="${escape(portrait)}" alt="서동민 프로필 사진" width="${Number(assets.profile?.portraitWidth) || 142}" height="${Number(assets.profile?.portraitHeight) || 189}" loading="lazy" decoding="async">` : ''}<p class="profile-person-name">${escape(site.name)}</p><p class="profile-english-name">${escape(profile.englishName)}</p><span class="profile-person-role">${escape(site.role)}</span></div><a class="text-link profile-contact" href="#contact">연락처 보기 <span aria-hidden="true">↓</span></a>`);
+  html('#profile-facts', `<div class="profile-fact-column"><section class="profile-group"><h3>학력 사항</h3><ol class="profile-timeline">${(profile.education || []).map(item => `<li><span>${escape(item.year)}</span><p>${escape(item.description)}</p></li>`).join('')}</ol></section><section class="profile-group"><h3>보유 역량</h3><dl class="profile-capabilities">${(profile.capabilities || []).map(item => `<div><dt>${escape(item.label)}</dt><dd>${escape(item.value)}</dd></div>`).join('')}</dl></section></div><div class="profile-fact-column"><section class="profile-group"><h3>프로젝트 이력</h3><ol class="profile-projects">${(profile.projects || []).map(project => `<li><span class="profile-date">${escape(project.period)}</span><a class="profile-project-name" href="#${escape(project.target)}">${escape(project.name)} <span aria-hidden="true">↗</span></a><p>${escape(project.type)}</p><p>${escape(project.role)}</p></li>`).join('')}</ol></section><section class="profile-group"><h3>전시 이력</h3><p class="profile-exhibition"><span class="profile-date">${escape(profile.exhibition?.year)}</span><strong>${escape(profile.exhibition?.description)}</strong><span>${escape(profile.exhibition?.project)}</span></p></section></div>`);
+  html('#profile-tools', `<h3>보유 기술</h3><ul>${(profile.tools || []).map(tool => `<li>${escape(tool)}</li>`).join('')}</ul>`);
+  html('#principles', site.principles.map(principle => `<div class="principle"><span>${escape(principle.label)}</span><b>${escape(principle.title)}</b><p>${escape(principle.description)}</p></div>`).join(''));
+  html('#gamegrid', games.map((game, i) => `<details class="game"><summary><small>${number(i + 1)} / ${escape(game.category)}</small><strong>${escape(game.name)}</strong><span>${escape(game.headline)} · ${escape(ui.gameExpand)}</span></summary><div class="inside"><p class="draft-label">${escape(ui.gameNote)}</p><ul class="game-story">${ui.gameLabels.map((label, j) => `<li><b>${escape(label)}</b><p>${escape(game.paragraphs[j])}</p></li>`).join('')}</ul></div></details>`).join(''));
+
+  const contactLinks = [];
+  const email = String(assets.contact?.email || '').trim();
+  const phone = String(assets.contact?.phone || '').trim();
+  if (/^[^\s@<>]+@[^\s@<>]+\.[^\s@<>]+$/.test(email)) contactLinks.push(`<a class="contact-link" href="mailto:${escape(email)}"><small>이메일</small><strong>${escape(email)}</strong><span aria-hidden="true">↗</span></a>`);
+  const dialable = phone.replace(/[^+\d]/g, '');
+  if (/^\+?\d{7,15}$/.test(dialable)) contactLinks.push(`<a class="contact-link" href="tel:${escape(dialable)}"><small>전화</small><strong>${escape(phone)}</strong><span aria-hidden="true">↗</span></a>`);
+  html('#contact-links', contactLinks.join(''));
+  const contactSection = document.getElementById('contact');
+  if (contactSection) contactSection.hidden = !contactLinks.length;
+  document.querySelectorAll('nav .links a[href="#contact"]').forEach(link => { link.hidden = !contactLinks.length; });
+
+  const workDialog = document.getElementById('modal');
+  const imageDialog = document.getElementById('image-modal');
+  const dialogs = [workDialog, imageDialog].filter(Boolean);
+  const dialogTriggers = new WeakMap();
+  let previousOverflow = '';
+  function openDialog(dialog, trigger = document.activeElement) {
+    if (!dialog || dialog.open) return;
+    if (!dialogs.some(node => node.open)) previousOverflow = document.body.style.overflow;
+    dialogTriggers.set(dialog, trigger);
+    document.body.style.overflow = 'hidden';
+    document.body.classList.add('modal-open');
+    closeMenu();
+    dialog.showModal();
   }
-  text('#games > .tiny', site.games.note);
-  text('.closing .eyebrow', site.closing.eyebrow);
-  html('.closing h2', `${escape(site.closing.heading[0])}<br><strong>${escape(site.closing.heading[1])}</strong>`);
-  html('.closing p', lines(site.closing.description));
-  text('.closing .actions button', site.closing.profileAction);
-  text('.closing .actions a', site.closing.backAction);
-  document.querySelectorAll('footer span').forEach((node, i) => { node.textContent = site.footer[i]; });
-  text('.modal-close', ui.closeLabel);
-  document.querySelector('.modal-close').setAttribute('aria-label', ui.closeAriaLabel);
-
-  html('.filters', ui.categories.map((category, i) => `<button class="filter ${i ? '' : 'active'}" aria-pressed="${!i}" data-cat="${escape(category)}">${escape(category)}</button>`).join(''));
-  html('#worklist', works.map((work, i) => `<article class="work" data-category="${escape(work.category)}" id="work-${i}"><div class="overview"><div class="visual">${art(work.art)}<span class="vlabel">${escape(ui.visualNote)}</span></div><div><div class="eyebrow">${escape(work.eyebrow)}</div><h3>${escape(work.title)}</h3><b>${escape(work.subtitle)}</b><p>${escape(work.summary)}</p><div class="role"><small>${escape(ui.roleLabel)}</small>${escape(work.role)}</div><div class="actions">${work.actions.map((action, j) => `<button class="btn${j === 0 ? ' primary' : ''}" data-work-index="${i}" data-action-index="${j}">${escape(action.label)}</button>`).join('')}</div></div></div><div class="explore">${ui.detailLabels.map((label, j) => `<button class="expbtn" aria-expanded="false" aria-controls="detail-${i}-${j}" id="toggle-${i}-${j}" data-work="${i}" data-part="${j}"><small>0${j + 1}</small><b>${escape(label)}</b><span aria-hidden="true">＋</span></button>`).join('')}</div>${ui.detailLabels.map((label, j) => `<div class="detail" id="detail-${i}-${j}" role="region" aria-labelledby="toggle-${i}-${j}" hidden><h4>${escape(label)}</h4><ul class="project-story">${work.details[j].map(paragraph => `<li>${escape(paragraph)}</li>`).join('')}</ul>${j === 1 ? `<div class="check">${escape(ui.checkLabel)} · ${escape(work.check)}</div>` : ''}<p class="sample">${escape(work.sources)}</p></div>`).join('')}</article>`).join(''));
-  document.querySelectorAll('.visual svg').forEach(node => { node.setAttribute('aria-label', ui.visualLabel); });
-  text('#count', `${works.length}${ui.workCount}`);
-  document.querySelectorAll('.filter').forEach(button => {
-    button.onclick = () => {
-      document.querySelectorAll('.filter').forEach(node => {
-        node.classList.toggle('active', node === button);
-        node.setAttribute('aria-pressed', String(node === button));
-      });
-      let count = 0;
-      document.querySelectorAll('.work').forEach(node => {
-        node.hidden = button.dataset.cat !== ui.allCategory && node.dataset.category !== button.dataset.cat;
-        if (!node.hidden) count++;
-      });
-      text('#count', `${count}${ui.workCount}`);
-    };
-  });
-  document.querySelectorAll('.expbtn').forEach(button => {
-    button.onclick = () => {
-      const expanded = button.getAttribute('aria-expanded') === 'true';
-      const article = button.closest('article');
-      article.querySelectorAll('.expbtn').forEach(node => { node.setAttribute('aria-expanded', 'false'); node.querySelector('span').textContent = '＋'; });
-      article.querySelectorAll('.detail').forEach(node => { node.hidden = true; });
-      if (!expanded) {
-        button.setAttribute('aria-expanded', 'true');
-        button.querySelector('span').textContent = '−';
-        document.getElementById(button.getAttribute('aria-controls')).hidden = false;
+  dialogs.forEach(dialog => {
+    dialog.addEventListener('close', () => {
+      dialog.querySelectorAll('video').forEach(video => video.pause());
+      if (!dialogs.some(node => node.open)) {
+        document.body.style.overflow = previousOverflow;
+        document.body.classList.remove('modal-open');
       }
-    };
+      const trigger = dialogTriggers.get(dialog);
+      if (trigger?.isConnected) trigger.focus({ preventScroll: true });
+      queueProgress();
+    });
+    dialog.addEventListener('click', event => {
+      if (event.target !== dialog) return;
+      const rect = dialog.getBoundingClientRect();
+      if (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom) dialog.close();
+    });
   });
-  html('#gamegrid', games.map((game, i) => `<details class="game"><summary><small>0${i + 1} / ${escape(game.category)}</small><strong>${escape(game.name)}</strong><span>${escape(game.headline)} · ${escape(ui.gameExpand)}</span></summary><div class="inside"><p class="draft-label">${escape(ui.gameNote)}</p><ul class="game-story">${ui.gameLabels.map((label, j) => `<li><b>${escape(label)}</b><p>${escape(game.paragraphs[j])}</p></li>`).join('')}</ul></div></details>`).join(''));
+  document.querySelector('.modal-close')?.addEventListener('click', () => workDialog?.close());
+  document.querySelector('.image-close')?.addEventListener('click', () => imageDialog?.close());
 
-  const modal = document.getElementById('modal');
-  function openModal(title, paragraphs, source, url) {
-    let link = '';
-    if (url) {
-      const parsed = new URL(url, document.baseURI);
-      const relativeFile = location.protocol === 'file:' && parsed.protocol === 'file:' && !/^(?:[a-z][a-z0-9+.-]*:|[\\/])/i.test(url);
-      if (parsed.protocol === 'https:' || (parsed.origin === location.origin && parsed.protocol === 'http:') || relativeFile) {
-        link = `<a class="btn" href="${escape(parsed.href)}" target="_blank" rel="noopener noreferrer">${escape(ui.linkLabel)}</a>`;
+  function evidenceMedia(work) {
+    const media = assets.works?.[work.id];
+    if (!media) return [];
+    const candidates = [media, ...(Array.isArray(media.gallery) ? media.gallery : [])];
+    const seen = new Set();
+    return candidates.filter(item => {
+      const src = safeURL(item?.src);
+      if (!src || seen.has(src)) return false;
+      seen.add(src);
+      return true;
+    });
+  }
+
+  function openWork(index, trigger) {
+    const work = works[index];
+    if (!work || !workDialog) return;
+    text('#modal-title', work.title);
+    const evidence = evidenceMedia(work);
+    const externalActions = work.actions.map(action => ({ ...action, url: safeURL(action.url) })).filter(action => action.url);
+    const sourceDocument = index === 4 ? documents.monster : index === 5 ? documents.guardian : null;
+    const sourceActions = sourceDocument ? documentLinks(sourceDocument, 'modal-action-links') : overviewURL ? '<div class="modal-action-links"><a class="text-link" href="#portfolio-overview" data-overview-link>포트폴리오 개요 PDF 안내 <span aria-hidden="true">↑</span></a></div>' : '';
+    html('#modal-body', `<div class="work-modal-heading"><div class="eyebrow">${escape(work.eyebrow)}</div><p class="work-subtitle">${escape(work.subtitle)}</p><p>${escape(work.summary)}</p><div class="role"><small>${escape(ui.roleLabel)}</small><span>${escape(work.role)}</span></div></div><div class="modal-summary-grid">${ui.detailLabels.map((label, part) => `<a class="modal-summary-card" href="#work-detail-${index}-${part}" data-detail-target="work-detail-${index}-${part}"><small>${number(part + 1)}</small><strong>${escape(label)}</strong><p>${escape(firstSentence(work.details[part][0]))}</p><span aria-hidden="true">↓</span></a>`).join('')}</div><div class="detail-sections">${ui.detailLabels.map((label, part) => `<section class="detail-section" id="work-detail-${index}-${part}"><h3><span>${number(part + 1)}</span> ${escape(label)}</h3>${work.details[part].map(paragraph => `<p>${escape(paragraph)}</p>`).join('')}${part === 1 ? `<div class="detail-check"><small>${escape(ui.checkLabel)}</small><p>${escape(work.check)}</p></div>` : ''}</section>`).join('')}</div>${evidence.length ? `<div class="evidence-gallery">${evidence.map((media, i) => `<figure class="evidence-item">${mediaMarkup(media, `${work.title} 작업 자료 ${i + 1}`)}${media.alt ? `<figcaption class="evidence-caption">${escape(media.alt)}</figcaption>` : ''}</figure>`).join('')}</div>` : ''}<p class="modal-source">${escape(work.sources)}</p>${sourceActions}${externalActions.length ? `<div class="modal-action-links">${externalActions.map(action => `<a class="btn" href="${escape(action.url)}" target="_blank" rel="noopener noreferrer">${escape(action.label)}</a>`).join('')}</div>` : ''}`);
+    openDialog(workDialog, trigger);
+    const body = document.getElementById('modal-body');
+    if (body) body.scrollTop = 0;
+    workDialog.scrollTop = 0;
+  }
+
+  function openMedia(button) {
+    if (!imageDialog) return;
+    const isVideo = Boolean(button.dataset.videoOpen);
+    const src = safeURL(button.dataset.videoOpen || button.dataset.imageOpen);
+    if (!src) return;
+    const title = button.dataset.mediaTitle || '';
+    const image = document.getElementById('lightbox-image');
+    let video = document.getElementById('lightbox-video');
+    text('#image-title', title);
+    if (isVideo && !video) {
+      video = document.createElement('video');
+      video.id = 'lightbox-video';
+      video.className = 'video-player';
+      video.controls = true;
+      video.playsInline = true;
+      video.preload = 'metadata';
+      image?.insertAdjacentElement('afterend', video);
+    }
+    if (video) {
+      video.pause();
+      video.hidden = !isVideo;
+      if (isVideo) {
+        video.src = src;
+        video.poster = safeURL(button.dataset.mediaPoster);
       }
     }
-    html('#modal-body', `<div class="eyebrow">${escape(ui.modalEyebrow)}</div><h2 id="modal-title">${escape(title)}</h2><div class="doc">${paragraphs.map(paragraph => `<p>${escape(paragraph)}</p>`).join('')}</div><p class="tiny">${escape(source)}</p>${link}`);
-    modal.showModal();
+    if (image) {
+      image.hidden = isVideo;
+      if (!isVideo) { image.src = safeURL(button.dataset.mediaOriginal) || src; image.alt = title; }
+    }
+    const originalLink = document.getElementById('image-original');
+    if (originalLink) {
+      originalLink.href = safeURL(button.dataset.mediaOriginal) || src;
+      originalLink.target = '_blank';
+      originalLink.rel = 'noopener noreferrer';
+      originalLink.textContent = isVideo ? '원본 영상 열기 ↗' : '원본 이미지 열기 ↗';
+    }
+    openDialog(imageDialog, button);
   }
-  document.querySelectorAll('[data-modal]').forEach(button => { button.onclick = () => openModal(profile.title, profile.paragraphs, profile.sourceNote, profile.url); });
-  document.querySelectorAll('[data-work-index]').forEach(button => {
-    button.onclick = () => {
-      const work = works[Number(button.dataset.workIndex)];
-      const action = work.actions[Number(button.dataset.actionIndex)];
-      openModal(action.title, work.details[action.detail], work.sources, action.url);
-    };
+
+  document.addEventListener('click', event => {
+    const overviewLink = event.target.closest('[data-overview-link]');
+    if (overviewLink) {
+      closeMenu();
+      if (dialogs.some(dialog => dialog.open)) {
+        event.preventDefault();
+        dialogs.forEach(dialog => { if (dialog.open) { dialogTriggers.delete(dialog); dialog.close(); } });
+        history.pushState(null, '', '#portfolio-overview');
+        requestAnimationFrame(() => {
+          document.getElementById('overview-title')?.focus({ preventScroll: true });
+          document.getElementById('portfolio-overview')?.scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' });
+        });
+      }
+      return;
+    }
+    const workButton = event.target.closest('[data-work-open]');
+    if (workButton) { openWork(Number(workButton.dataset.workOpen), workButton); return; }
+    const mediaButton = event.target.closest('[data-image-open], [data-video-open]');
+    if (mediaButton) { openMedia(mediaButton); return; }
+    const detailLink = event.target.closest('[data-detail-target]');
+    if (detailLink) {
+      event.preventDefault();
+      document.getElementById(detailLink.dataset.detailTarget)?.scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' });
+    }
   });
-  document.querySelector('.modal-close').onclick = () => modal.close();
-  modal.addEventListener('click', event => {
-    if (event.target !== modal) return;
-    const rect = modal.getBoundingClientRect();
-    if (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom) modal.close();
+
+  const menuToggle = document.querySelector('.menu-toggle');
+  const navigation = document.querySelector('nav .links');
+  function closeMenu() {
+    menuToggle?.setAttribute('aria-expanded', 'false');
+    menuToggle?.classList.remove('is-open');
+    navigation?.classList.remove('is-open');
+    document.body.classList.remove('menu-open');
+  }
+  menuToggle?.addEventListener('click', () => {
+    const open = menuToggle.getAttribute('aria-expanded') !== 'true';
+    menuToggle.setAttribute('aria-expanded', String(open));
+    menuToggle.classList.toggle('is-open', open);
+    navigation?.classList.toggle('is-open', open);
+    document.body.classList.toggle('menu-open', open);
   });
+  document.querySelectorAll('nav a').forEach(link => link.addEventListener('click', closeMenu));
+  document.addEventListener('keydown', event => { if (event.key === 'Escape') closeMenu(); });
+  window.matchMedia('(min-width: 769px)').addEventListener('change', event => { if (event.matches) closeMenu(); });
+
+  const progress = document.querySelector('.scroll-progress span');
+  let progressFrame = 0;
+  function queueProgress() {
+    if (progressFrame) return;
+    progressFrame = requestAnimationFrame(() => {
+      const available = document.documentElement.scrollHeight - window.innerHeight;
+      const fraction = available > 0 ? Math.max(0, Math.min(1, window.scrollY / available)) : 0;
+      if (progress) progress.style.transform = `scaleX(${fraction})`;
+      progressFrame = 0;
+    });
+  }
+  window.addEventListener('scroll', queueProgress, { passive: true });
+  window.addEventListener('resize', queueProgress, { passive: true });
+  window.addEventListener('load', queueProgress, { once: true });
+  document.querySelectorAll('details').forEach(node => node.addEventListener('toggle', queueProgress));
+  queueProgress();
+  const navLinks = [...document.querySelectorAll('nav .links a[href^="#"]')].filter(link => !link.hidden);
+  const sections = navLinks.map(link => document.getElementById(link.hash.slice(1))).filter(section => section && !section.hidden);
+  function activateSection(section) {
+    navLinks.forEach(link => {
+      const active = Boolean(section && link.hash === `#${section.id}`);
+      link.classList.toggle('active', active);
+      if (active) link.setAttribute('aria-current', 'location');
+      else link.removeAttribute('aria-current');
+    });
+  }
+  if ('IntersectionObserver' in window) {
+    const visibleSections = new Map();
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => visibleSections.set(entry.target, entry.isIntersecting));
+      const visible = sections.filter(section => visibleSections.get(section));
+      const passed = sections.filter(section => section.getBoundingClientRect().top <= window.innerHeight * .4);
+      const candidates = visible.length ? visible : passed;
+      candidates.sort((a, b) => b.getBoundingClientRect().top - a.getBoundingClientRect().top);
+      activateSection(candidates[0]);
+    }, { rootMargin: '-18% 0px -58% 0px', threshold: 0 });
+    sections.forEach(section => observer.observe(section));
+  }
+  function openLegacyHash() {
+    const match = location.hash.match(/^#work-(\d+)$/);
+    if (match && works[Number(match[1])]) openWork(Number(match[1]));
+  }
+  window.addEventListener('hashchange', openLegacyHash);
+  openLegacyHash();
 })();
