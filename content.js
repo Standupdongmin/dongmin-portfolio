@@ -61,8 +61,8 @@ window.PORTFOLIO_CONTENT = {
       "eyebrow": "플레이어로서의 호기심",
       "title": "나를 만든 게임들.",
       "description": [
-        "FPS와 액션 RPG에서 생존과 전략까지.",
-        "플레이한 게임과 기획에 참고할 관점을 정리했습니다."
+        "게임의 규칙이 플레이어의 선택과 재미에 미치는 영향을 분석했습니다.",
+        "그 경험을 바탕으로 프로젝트의 시스템·UI·전투 피드백을 설계했습니다."
       ],
       "note": "플레이한 게임은 포트폴리오 개요의 목록을 기준으로 정리했습니다. 카드에는 게임별로 살펴볼 기획 관점을 담았습니다."
     },
@@ -772,7 +772,7 @@ window.PORTFOLIO_CONTENT = {
           "DeathMesh는 사망 후 남는 시체 오브젝트를 나타내는 Object입니다.",
           "PatrolMode는 랜덤·지정 방식을 구분하는 Enum이며, PatrolPoint와 PatrolVector는 Vector3입니다.",
           "SelectSkill은 Bool이며 SelectedSkill은 선정된 스킬의 ID를 나타내는 Int입니다.",
-          "SkillCooldown은 각 스킬의 남은 쿨타임이며, MonSkill의 SkillRange는 사용 가능한 범위를 나타내는 Float입니다.",
+          "SkillCooldown은 각 스킬의 남은 쿨타임을 나타내는 Float이며, MonSkill의 SkillRange는 사용 가능한 범위를 나타내는 Float입니다.",
           "SkillCollider는 스킬 충돌체를 나타내는 Object입니다.",
           "MonSkill의 DebuffEffect와 BuffEffect는 효과를 참조하는 정수 ID이며, Damage는 피해량을 나타내는 Float입니다.",
           "NowHP는 현재 체력을 나타내는 Float이고 AggressiveType은 선공 여부를 나타내는 Bool입니다.",
@@ -1004,9 +1004,10 @@ window.PORTFOLIO_CONTENT = {
           "창 찌르기의 대응 방식을 유지해, 바뀐 외형에서도 시선과 준비 동작을 보고 회피하게 합니다.",
           "말이 앞발을 들고 투레질하는 전조 후 후방의 가까운 대상을 향해 3m 범위를 뒷발로 공격합니다.",
           "방패 휘두르기를 대체하며, 후방 공격을 피하는 기존 학습을 새 외형에 연결합니다.",
-          "랜스를 앞으로 뻗어 언월도로 바꾼 뒤 주변 5m를 360도로 회전하며 2초간 공격합니다.",
+          "랜스를 앞으로 뻗어 언월도로 바꾼 뒤, 언월도를 360도로 회전시켜 주변 5m를 2초간 공격합니다.",
           "근처에 모인 플레이어가 무기 변형을 보고 회피하도록 유도하는 견제 패턴입니다.",
-          "말이 도약해 가장 먼 대상의 발밑에 범위를 표시하고 창을 던진 뒤, 1초 후 창이 박힌 위치로 돌진합니다.",
+          "말이 도약하면 보스가 가장 먼 대상을 겨누고, 대상의 발밑에 피격 범위가 표시된 뒤 창을 던집니다.",
+          "1초 후 창이 박힌 위치로 돌진해 창을 붙잡습니다.",
           "창에 적중하면 꼬챙이와 무력화 기회가 이어져, 회피하거나 한 명이 잡히는 위험을 감수할지 선택하도록 설계했습니다.",
           "말이 오른발로 땅을 세 번 차고 가장 먼 대상을 향해 돌진하며, 노란색으로 변하는 순간 저스트 가드로 대응합니다.",
           "창 돌진에서 익힌 대응을 이어가고, 성공 시 보스 버프를 감소시키는 보상을 설정했습니다.",
@@ -1170,39 +1171,40 @@ window.PORTFOLIO_CONTENT = {
           "title": "2페이즈 · 투창 돌진",
           "sentenceIndices": [
             34,
-            35
+            35,
+            36
           ],
           "asList": true
         },
         {
           "title": "2페이즈 · 마창 돌진",
           "sentenceIndices": [
-            36,
-            37
+            37,
+            38
           ],
           "asList": true
         },
         {
           "title": "2페이즈 · 꼬챙이",
           "sentenceIndices": [
-            38,
-            39
+            39,
+            40
           ],
           "asList": true
         },
         {
           "title": "2페이즈 · 태풍",
           "sentenceIndices": [
-            40,
-            41
+            41,
+            42
           ],
           "asList": true
         },
         {
           "title": "2페이즈 · 태풍 내부",
           "sentenceIndices": [
-            42,
-            43
+            43,
+            44
           ],
           "asList": true
         }
@@ -1515,7 +1517,7 @@ window.PORTFOLIO_CONTENT = {
         "작업 내용",
         "확인 기준"
       ],
-      "sourceNote": "ChatGPT·Gemini·Claude의 공동 활용 범위로 제시된 사례입니다. 원문은 특정 도구의 단독 수행으로 구분하지 않습니다."
+      "sourceNote": "ChatGPT·Gemini·Claude를 활용한 제작 보조 사례 중 하나입니다."
     },
     {
       "id": "ai-production",
@@ -1578,7 +1580,7 @@ window.PORTFOLIO_CONTENT = {
         "작업 내용",
         "확인 기준"
       ],
-      "sourceNote": "아래는 ChatGPT·Gemini·Claude의 공동 활용 범위입니다. 개별 사례를 특정 도구의 단독 성과로 구분하지 않습니다."
+      "sourceNote": "ChatGPT·Gemini·Claude를 함께 활용한 제작 보조 사례입니다."
     }
   ],
   "games": [
@@ -1635,7 +1637,7 @@ window.PORTFOLIO_CONTENT = {
         "반복 토벌의 재미와 기믹 피로를 함께 살펴볼 수 있습니다.",
         "신규 가디언 제안서는 전조를 읽고 공격을 이어가거나 대응해 추가 기회를 만드는 선택을 설계했습니다."
       ],
-      "sourceNote": "포트폴리오 개요 4쪽은 플레이 목록과 공통 분석 방향을 확인하는 근거입니다. 게임별 설명은 검토 관점입니다."
+      "sourceNote": "포트폴리오 개요 4쪽의 플레이 목록·공통 분석 방향과 15쪽의 가디언 전투 기획을 기준으로 정리했습니다. 게임별 설명은 검토 관점입니다."
     },
     {
       "name": "ARK: Survival Evolved",

@@ -700,7 +700,7 @@ window.PORTFOLIO_ASSETS = {
         {
           "src": "assets/media/ai-animation.webp",
           "type": "image",
-          "alt": "AI를 활용한 애니메이션 보정의 실제 작업 화면",
+          "alt": "AI를 활용한 애니메이션 보정 전후 비교 자료",
           "sourcePage": 20,
           "width": 1600,
           "height": 900,

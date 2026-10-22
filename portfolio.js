@@ -152,6 +152,23 @@
   const imageDialog = document.getElementById('image-modal');
   const dialogs = [workDialog, imageDialog].filter(Boolean);
   const dialogTriggers = new WeakMap();
+  const imageZoom = document.getElementById('image-zoom');
+  const imageStage = document.getElementById('lightbox-stage');
+  function setImageZoom(zoomed) {
+    if (!imageDialog || !imageStage) return;
+    const image = document.getElementById('lightbox-image');
+    imageDialog.dataset.zoomed = String(zoomed);
+    if (imageZoom) {
+      imageZoom.setAttribute('aria-pressed', String(zoomed));
+      imageZoom.textContent = zoomed ? '화면에 맞추기 ↙' : '원본 크기로 확대 ↗';
+    }
+    text('#image-zoom-hint', zoomed ? '좌우·상하로 이동해 확인하세요.' : '작은 글자까지 확인하세요.');
+    if (zoomed && image) image.style.width = `${image.naturalWidth || 1800}px`;
+    else if (image) image.style.removeProperty('width');
+    imageStage.scrollTop = 0;
+    imageStage.scrollLeft = 0;
+  }
+  imageZoom?.addEventListener('click', () => setImageZoom(imageDialog?.dataset.zoomed !== 'true'));
   let previousOverflow = '';
   function openDialog(dialog, trigger = document.activeElement) {
     if (!dialog || dialog.open) return;
@@ -278,6 +295,9 @@
     const src = safeURL(button.dataset.videoOpen || button.dataset.imageOpen);
     if (!src) return;
     const title = button.dataset.mediaTitle || '';
+    setImageZoom(false);
+    const imageTools = imageDialog.querySelector('.image-tools');
+    if (imageTools) imageTools.hidden = isVideo;
     const image = document.getElementById('lightbox-image');
     let video = document.getElementById('lightbox-video');
     text('#image-title', title);
@@ -300,7 +320,19 @@
     }
     if (image) {
       image.hidden = isVideo;
-      if (!isVideo) { image.src = safeURL(button.dataset.mediaOriginal) || src; image.alt = title; }
+      if (!isVideo) {
+        const preview = button.querySelector('img');
+        image.width = Number(preview?.getAttribute('width')) || 1600;
+        image.height = Number(preview?.getAttribute('height')) || 900;
+        imageStage?.setAttribute('aria-busy', 'true');
+        image.src = safeURL(button.dataset.mediaOriginal) || src;
+        image.alt = title;
+        image.onload = () => {
+          if (imageDialog.dataset.zoomed === 'true') image.style.width = `${image.naturalWidth}px`;
+          imageStage?.setAttribute('aria-busy', 'false');
+        };
+        image.onerror = () => imageStage?.setAttribute('aria-busy', 'false');
+      }
     }
     const originalLink = document.getElementById('image-original');
     if (originalLink) {

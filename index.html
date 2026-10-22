@@ -10,10 +10,10 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@500;600;700;800&amp;family=Noto+Sans+KR:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=20261022-source-review-2">
-  <script src="content.js?v=20261022-source-review-2" defer></script>
-  <script src="assets.js?v=20261022-source-review-2" defer></script>
-  <script src="portfolio.js?v=20261022-source-review-2" defer></script>
+  <link rel="stylesheet" href="styles.css?v=20261022-recheck-3">
+  <script src="content.js?v=20261022-recheck-3" defer></script>
+  <script src="assets.js?v=20261022-recheck-3" defer></script>
+  <script src="portfolio.js?v=20261022-recheck-3" defer></script>
 </head>
 <body>
   <a class="skip-link" href="#main-content">본문으로 건너뛰기</a>
@@ -50,7 +50,7 @@
           </div>
         </div>
         <div class="principles" id="principles"></div>
-        <details class="play-history"><summary><span>플레이어로서의 시선</span><span>나를 만든 게임들 <b aria-hidden="true">＋</b></span></summary><div class="play-history-body"><p class="history-intro">FPS와 액션 RPG에서 생존과 전략까지. 플레이한 게임과 기획에 참고할 관점을 정리했습니다.</p><div class="gamegrid" id="gamegrid"></div></div></details>
+        <details class="play-history"><summary><span>플레이어로서의 시선</span><span>나를 만든 게임들 <b aria-hidden="true">＋</b></span></summary><div class="play-history-body"><div class="history-intro prose"><p>FPS·RPG·전략 게임을 플레이하며, 규칙이 선택과 재미에 미치는 영향을 분석했습니다.</p><p>그 경험을 바탕으로 프로젝트에서 전달할 재미를 정하고 시스템·UI·전투 피드백을 설계했습니다.</p></div><div class="gamegrid" id="gamegrid"></div></div></details>
       </div>
     </section>
 
@@ -85,6 +85,6 @@
   <footer class="wrap"><a href="#home" class="footer-name">서동민<span>.</span></a><p>게임 기획 포트폴리오</p><a href="#home">맨 위로 ↑</a></footer>
 
   <dialog id="modal" aria-labelledby="modal-title"><div class="modal-shell"><div class="modal-bar"><h2 id="modal-title" tabindex="-1">작업 상세</h2><button class="modal-close" type="button" aria-label="작업 상세 닫기">닫기 <span aria-hidden="true">×</span></button></div><div id="modal-body" class="modal-body"></div></div></dialog>
-  <dialog id="image-modal" aria-labelledby="image-title"><div class="modal-bar"><h2 id="image-title">작업 이미지</h2><button class="image-close" type="button" aria-label="이미지 닫기">닫기 <span aria-hidden="true">×</span></button></div><div class="lightbox-content"><img id="lightbox-image" alt=""><a id="image-original" class="text-link" target="_blank" rel="noopener noreferrer">원본 파일 열기 ↗</a></div></dialog>
+  <dialog id="image-modal" aria-labelledby="image-title"><div class="modal-bar"><h2 id="image-title">작업 이미지</h2><button class="image-close" type="button" aria-label="이미지 닫기">닫기 <span aria-hidden="true">×</span></button></div><div class="image-tools"><button type="button" class="text-link" id="image-zoom" aria-pressed="false" aria-controls="lightbox-stage">원본 크기로 확대 ↗</button><span id="image-zoom-hint">작은 글자까지 확인하세요.</span></div><div class="lightbox-content"><div class="lightbox-stage" id="lightbox-stage" tabindex="0" role="region" aria-label="이미지 보기 영역"><img id="lightbox-image" alt=""></div><a id="image-original" class="text-link" target="_blank" rel="noopener noreferrer">원본 파일 열기 ↗</a></div></dialog>
 </body>
 </html>

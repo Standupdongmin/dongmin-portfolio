@@ -333,9 +333,17 @@ dialog::backdrop { background: #000c; backdrop-filter: blur(6px); }
 .modal-action-links { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 24px; }
 #image-modal { width: min(1440px, calc(100% - 32px)); }
 #image-modal[open] { display: flex; flex-direction: column; }
+.image-tools { display: flex; align-items: center; flex-wrap: wrap; gap: 0 24px; flex: 0 0 auto; padding: 4px 24px; border-bottom: 1px solid var(--line); }
+.image-tools > span { color: var(--muted); font-size: 13px; }
 .lightbox-content { display: flex; align-items: center; flex-direction: column; gap: 16px; padding: 24px; max-height: calc(100dvh - 142px); overflow: auto; overscroll-behavior: contain; }
 #image-modal .lightbox-content { flex: 1; min-height: 0; max-height: none; }
-#lightbox-image { width: auto; height: auto; max-width: 100%; max-height: calc(100dvh - 230px); object-fit: contain; }
+.lightbox-stage { width: 100%; min-height: 0; overflow: auto; overscroll-behavior: contain; }
+.lightbox-stage > img { margin-inline: auto; }
+#image-modal[data-zoomed="true"] { height: calc(100dvh - 48px); }
+#image-modal[data-zoomed="true"] .lightbox-content { overflow: hidden; }
+#image-modal[data-zoomed="true"] .lightbox-stage { flex: 1; }
+#image-modal[data-zoomed="true"] #lightbox-image { max-width: none; max-height: none; margin: 0; }
+#lightbox-image { width: auto; height: auto; max-width: 100%; max-height: calc(100dvh - 280px); object-fit: contain; }
 #lightbox-image { flex-shrink: 0; }
 #image-original { flex-shrink: 0; }
 .video-player { display: block; width: 100%; max-height: calc(100dvh - 220px); background: #000; }
@@ -564,8 +572,10 @@ dialog::backdrop { background: #000c; backdrop-filter: blur(6px); }
   .detail-index nav { grid-template-columns: 1fr; }
   .evidence-gallery { grid-template-columns: 1fr; gap: 24px; }
   #image-modal { width: calc(100% - 16px); }
+  .image-tools { gap: 0 16px; padding-inline: 16px; }
+  .image-tools > span { font-size: 12px; }
   .lightbox-content { padding: 16px; max-height: calc(100dvh - 114px); }
-  #lightbox-image { max-height: calc(100dvh - 208px); }
+  #lightbox-image { max-height: calc(100dvh - 300px); }
 }
 @media (max-width: 360px) {
   .hero h1 { font-size: 32px; }
