@@ -260,7 +260,7 @@
     workDialog.scrollTop = 0;
   }
 
-  function openMedia(button) {
+  function openMedia(button, trigger = button) {
     if (!imageDialog) return;
     const isVideo = Boolean(button.dataset.videoOpen);
     const src = safeURL(button.dataset.videoOpen || button.dataset.imageOpen);
@@ -297,7 +297,7 @@
       originalLink.rel = 'noopener noreferrer';
       originalLink.textContent = isVideo ? '원본 영상 열기 ↗' : '원본 이미지 열기 ↗';
     }
-    openDialog(imageDialog, button);
+    openDialog(imageDialog, trigger);
   }
 
   document.addEventListener('click', event => {
@@ -319,6 +319,12 @@
     if (capabilityButton) { openCapability(capabilityButton.dataset.capabilityOpen, capabilityButton); return; }
     const workButton = event.target.closest('[data-work-open]');
     if (workButton) { openWork(Number(workButton.dataset.workOpen), workButton); return; }
+    const captionButton = event.target.closest('[data-media-caption]');
+    if (captionButton) {
+      const media = captionButton.closest('figure')?.querySelector('.media-trigger');
+      if (media) openMedia(media, captionButton);
+      return;
+    }
     const mediaButton = event.target.closest('[data-image-open], [data-video-open]');
     if (mediaButton) { openMedia(mediaButton); return; }
     const detailLink = event.target.closest('[data-detail-target]');

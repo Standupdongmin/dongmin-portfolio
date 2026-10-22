@@ -90,6 +90,9 @@ h2 { font-size: 38px; line-height: 1.35; font-weight: 800; }
 .media-trigger:hover .media-expand { border-color: var(--accent); color: var(--accent); }
 .project-figure figcaption { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; margin-top: 12px; color: var(--muted); font-size: 13px; }
 .project-figure figcaption span { color: #999f90; }
+.caption-expand { display: inline-flex; align-items: center; min-height: 44px; padding: 0; border: 0; background: transparent; color: inherit; font: inherit; cursor: pointer; }
+.caption-expand:hover, .caption-expand:focus-visible { color: var(--accent); }
+.project-figure figcaption, .overview-figure figcaption { align-items: center; }
 .tag { display: inline-block; margin-bottom: 16px; font-size: 13px; line-height: 1.5; color: var(--accent); }
 .projects-section { padding-top: 64px; }
 .featured-project { padding-bottom: 48px; }
