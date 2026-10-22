@@ -41,14 +41,16 @@
     const groups = part === 1 && Array.isArray(work.solutionGroups) ? work.solutionGroups : [];
     const pool = work.details[part].flatMap(sentences);
     const grouped = new Set();
-    const groupedBody = groups.map(group => {
+    const groupId = index => `work-${work.id}-group-${index}`;
+    const groupIndex = groups.length >= 8 ? `<details class="detail-index"><summary>설계 항목 바로가기 <span>${groups.length}개 항목</span></summary><nav aria-label="설계 항목">${groups.map((group, index) => `<a href="#${escape(groupId(index))}" data-detail-target="${escape(groupId(index))}">${escape(group.title)} <span aria-hidden="true">↓</span></a>`).join('')}</nav></details>` : '';
+    const groupedBody = groups.map((group, index) => {
       const paragraphs = (group.sentenceIndices || []).filter(index => Number.isInteger(index) && index >= 0 && index < pool.length).map(index => { grouped.add(index); return pool[index]; });
       if (!paragraphs.length) return '';
-      return `<div class="detail-group"><h4>${escape(group.title)}</h4><div class="detail-group-body">${group.asList ? itemList(paragraphs, 'detail-group-list') : proseMarkup(paragraphs)}</div></div>`;
+      return `<div class="detail-group" id="${escape(groupId(index))}"><h4>${escape(group.title)}</h4><div class="detail-group-body">${group.asList ? itemList(paragraphs, 'detail-group-list') : proseMarkup(paragraphs)}</div></div>`;
     }).join('');
     const body = groups.length ? groupedBody + (grouped.size < pool.length ? proseMarkup(pool.filter((_, index) => !grouped.has(index))) : '') : work.details[part].map(paragraph => proseMarkup(paragraph)).join('');
     const check = part === 1 ? `<div class="detail-check"><small>${escape(ui.checkLabel)}</small>${itemList(work.check, 'check-items', ' / ')}</div>` : '';
-    return `<div class="detail-content">${body}${check}</div>`;
+    return `<div class="detail-content">${groupIndex}${body}${check}</div>`;
   }
 
   function safeURL(value) {
@@ -104,16 +106,19 @@
   });
   const overviewSection = document.getElementById('portfolio-overview');
   if (overviewSection) overviewSection.hidden = !overviewURL;
-  setMedia('#overview-preview', { src: documents.overview?.cover, alt: documents.overview?.title, width: 1280, height: 720 }, '포트폴리오 개요 표지');
+  setMedia('#overview-preview', { src: documents.overview?.cover, alt: documents.overview?.title, width: documents.overview?.coverWidth, height: documents.overview?.coverHeight }, '포트폴리오 개요 표지');
   text('#overview-file-meta', `포트폴리오 개요 · PDF · ${documents.overview?.pageCount || 21}쪽`);
   if (overviewURL) html('#overview-actions', `<a class="btn primary" href="${escape(overviewURL)}" download="${escape(documents.overview.fileName || '서동민_포폴_개요.pdf')}">개요 PDF 다운로드 <span aria-hidden="true">↓</span></a><a class="text-link" href="${escape(overviewURL)}" target="_blank" rel="noopener noreferrer">PDF 원본 보기 ↗</a>`);
 
   html('#battle-tasks', works.slice(0, 3).map((work, i) => `<article class="task-item"><div class="task-copy"><span class="eyebrow">${escape(work.eyebrow)}</span><h4>${escape(work.title)}</h4><p class="task-subtitle">${escape(work.subtitle)}</p></div><button type="button" class="text-link" data-work-open="${i}">제작 과정 보기 ↗</button></article>`).join(''));
-  html('#jump-actions', `<button type="button" class="btn primary" data-work-open="3">기획 과정 보기 ↗</button>`);
+  const battleVideoURL = safeURL(assets.projects?.battle?.videoUrl);
+  const jumpVideoURL = safeURL(assets.projects?.jump?.videoUrl);
+  if (battleVideoURL) html('#battle-actions', `<a class="btn" href="${escape(battleVideoURL)}" target="_blank" rel="noopener noreferrer">플레이 영상 보기 <span aria-hidden="true">↗</span></a>`);
+  html('#jump-actions', `<button type="button" class="btn primary" data-work-open="3">기획 과정 보기 ↗</button>${jumpVideoURL ? `<a class="btn" href="${escape(jumpVideoURL)}" target="_blank" rel="noopener noreferrer">플레이 영상 보기 <span aria-hidden="true">↗</span></a>` : ''}`);
   html('#document-grid', [4, 5].map((i, documentIndex) => {
     const work = works[i];
     const doc = documents[documentIndex === 0 ? 'monster' : 'guardian'];
-    const cover = typeof doc?.cover === 'string' ? { src: doc.cover, alt: doc.title || work.title } : doc?.cover;
+    const cover = typeof doc?.cover === 'string' ? { src: doc.cover, alt: doc.title || work.title, width: doc.coverWidth, height: doc.coverHeight } : doc?.cover;
     const preview = mediaMarkup(cover, work.title);
     return `<article class="doc-card">${preview ? `<div class="doc-preview">${preview}</div>` : ''}<div class="doc-content"><span class="doc-tag">개인 기획 · ${escape(work.category)}서</span><h3>${escape(work.title)}</h3><b class="work-subtitle">${escape(work.subtitle)}</b>${proseMarkup(work.summary)}<div class="doc-meta"><small>${escape(work.metaLabel || ui.roleLabel)}</small>${itemList(work.role)}</div><div class="doc-actions"><button type="button" class="btn primary" data-work-open="${i}">기획 내용 열람 ↗</button></div>${documentLinks(doc)}</div></article>`;
   }).join(''));
@@ -194,6 +199,7 @@
     const work = works[index];
     if (!work || !workDialog) return;
     const alreadyOpen = workDialog.open;
+    const detailLabels = Array.isArray(work.detailLabels) && work.detailLabels.length === 3 ? work.detailLabels : ui.detailLabels;
     delete workDialog.dataset.mode;
     workDialog.removeAttribute('aria-describedby');
     document.querySelector('.modal-close')?.setAttribute('aria-label', '작업 상세 닫기');
@@ -209,21 +215,22 @@
         ${proseMarkup(work.summary)}
         <div class="role"><small>${escape(work.metaLabel || ui.roleLabel)}</small>${itemList(work.role)}</div>
       </div>
-      <div class="modal-summary-grid">${ui.detailLabels.map((label, part) => `
+      <div class="modal-summary-grid">${detailLabels.map((label, part) => `
         <a class="modal-summary-card" href="#work-detail-${index}-${part}" data-detail-target="work-detail-${index}-${part}">
           <small>${number(part + 1)}</small><strong>${escape(label)}</strong>
           <p>${escape(firstSentence(work.details[part][0]))}</p><span aria-hidden="true">↓</span>
         </a>`).join('')}
       </div>
-      <div class="detail-sections">${ui.detailLabels.map((label, part) => `
+      ${evidence.length ? `<a class="text-link evidence-jump" href="#work-evidence-${index}" data-detail-target="work-evidence-${index}">원본 작업 자료 ${evidence.length}장 보기 <span aria-hidden="true">↓</span></a>` : ''}
+      <div class="detail-sections">${detailLabels.map((label, part) => `
         <section class="detail-section" id="work-detail-${index}-${part}">
           <h3><span>${number(part + 1)}</span> ${escape(label)}</h3>
           ${detailContent(work, part)}
         </section>`).join('')}
       </div>
-      ${evidence.length ? `<div class="evidence-gallery">${evidence.map((media, i) => `
+      ${evidence.length ? `<div class="evidence-gallery" id="work-evidence-${index}">${evidence.map((media, i) => `
         <figure class="evidence-item">${mediaMarkup(media, `${work.title} 작업 자료 ${i + 1}`)}${media.alt ? `<figcaption class="evidence-caption">${escape(media.alt)}</figcaption>` : ''}</figure>`).join('')}</div>` : ''}
-      <p class="modal-source">${escape(work.sources)}</p>
+      <p class="modal-source">${escape(work.sources)}${work.sourceNote ? `<br>${escape(work.sourceNote)}` : ''}</p>
       ${sourceActions}
       ${externalActions.length ? `<div class="modal-action-links">${externalActions.map(action => `<a class="btn" href="${escape(action.url)}" target="_blank" rel="noopener noreferrer">${escape(action.label)}</a>`).join('')}</div>` : ''}
     `);
@@ -259,7 +266,7 @@
     workDialog.setAttribute('aria-describedby', 'game-summary');
     document.querySelector('.modal-close')?.setAttribute('aria-label', '게임 경험 닫기');
     text('#modal-title', game.name);
-    html('#modal-body', `<div class="game-modal"><div class="capability-overview"><p class="eyebrow">${escape(game.category)}</p><p id="game-summary">${escape(game.headline)}</p></div><ul class="game-story">${ui.gameLabels.map((label, j) => `<li><h3>${escape(label)}</h3><p>${escape(game.paragraphs[j])}</p></li>`).join('')}</ul></div>`);
+    html('#modal-body', `<div class="game-modal"><div class="capability-overview"><p class="eyebrow">${escape(game.category)}</p><p id="game-summary">${escape(game.headline)}</p></div><ul class="game-story">${ui.gameLabels.map((label, j) => `<li><h3>${escape(label)}</h3><p>${escape(game.paragraphs[j])}</p></li>`).join('')}</ul>${game.sourceNote ? `<p class="modal-source">${escape(game.sourceNote)}</p>` : ''}</div>`);
     openDialog(workDialog, trigger);
     document.getElementById('modal-body').scrollTop = 0;
     workDialog.scrollTop = 0;

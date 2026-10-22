@@ -298,6 +298,17 @@ dialog::backdrop { background: #000c; backdrop-filter: blur(6px); }
 .detail-content > .prose + .prose { margin-top: 26px; }
 .detail-section .prose > p + p { margin-top: 14px; }
 .detail-group + .detail-group { margin-top: 28px; }
+.detail-group, .evidence-gallery { scroll-margin-top: 20px; }
+.detail-index { margin-bottom: 32px; border: 1px solid var(--line); border-radius: 4px; }
+.detail-index summary { display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 48px; padding: 12px 16px; cursor: pointer; font-size: 15px; color: var(--ink); }
+.detail-index summary > span { flex-shrink: 0; font-size: 13px; color: var(--muted); }
+.detail-index summary > span::after { content: ' ＋'; color: var(--ink); }
+.detail-index[open] summary > span::after { content: ' −'; }
+.detail-index nav { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 24px; border-top: 1px solid var(--line); padding: 8px 16px; }
+.detail-index nav a { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 44px; padding-block: 8px; color: var(--muted); font-size: 14px; line-height: 1.6; word-break: keep-all; overflow-wrap: anywhere; }
+.detail-index nav a:hover { color: var(--accent); }
+.detail-index nav a > span { flex-shrink: 0; }
+.evidence-jump { margin-top: 16px; }
 .detail-group h4 { color: var(--accent); font-size: 19px; font-weight: 700; line-height: 1.5; margin: 0 0 12px; }
 .detail-group-body { max-width: 680px; }
 .detail-group-body > .prose + .prose { margin-top: 20px; }
@@ -550,6 +561,7 @@ dialog::backdrop { background: #000c; backdrop-filter: blur(6px); }
   .detail-section h3 { font-size: 24px; margin-bottom: 20px; }
   .detail-section h4 { font-size: 18px; margin-bottom: 12px; }
   .detail-section .detail-group h4 { font-size: 18px; line-height: 1.5; margin-bottom: 12px; }
+  .detail-index nav { grid-template-columns: 1fr; }
   .evidence-gallery { grid-template-columns: 1fr; gap: 24px; }
   #image-modal { width: calc(100% - 16px); }
   .lightbox-content { padding: 16px; max-height: calc(100dvh - 114px); }
