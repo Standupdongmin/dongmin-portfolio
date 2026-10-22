@@ -215,19 +215,16 @@ h2 { font-size: 38px; line-height: 1.35; font-weight: 800; }
 .play-history-body { padding: 16px 0 32px; }
 .history-intro { font-size: 16px; color: var(--muted); margin-bottom: 24px; max-width: 70ch; }
 .gamegrid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
-.game { min-width: 0; border: 1px solid #363c30; border-radius: 4px; background: var(--bg); }
-.game > summary { position: relative; min-height: 170px; padding: 24px; cursor: pointer; list-style: none; }
-.game > summary::-webkit-details-marker { display: none; }
-.game summary small { display: block; font-size: 13px; color: #a9b99a; }
-.game summary strong { display: block; font-size: 22px; line-height: 1.4; margin: 12px 0; }
-.game summary span { font-size: 14px; color: var(--muted); line-height: 1.6; display: block; }
-.game[open] { grid-column: 1 / -1; }
-.game[open] > summary { min-height: 0; border-bottom: 1px solid var(--line); }
-.inside { padding: 24px; }
-.draft-label { color: #a9b99a; font-size: 13px; margin-bottom: 24px; }
-.game-story { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 32px; list-style: none; padding: 0; margin: 0; }
-.game-story b { font-size: 15px; }
-.game-story p { font-size: 16px; color: var(--muted); line-height: 1.8; margin-top: 16px; word-break: keep-all; }
+.game { min-width: 0; min-height: 200px; padding: 24px; border: 1px solid var(--line); border-radius: 4px; background: var(--bg); color: var(--ink); text-align: left; transition: border-color .15s; }
+.game:hover, .game:focus-visible { border-color: var(--accent); }
+.game > small { display: block; font-size: 13px; color: var(--muted); }
+.game > strong { display: block; font-size: 22px; line-height: 1.4; margin: 12px 0; }
+.game-headline { display: block; font-size: 14px; color: var(--muted); line-height: 1.6; }
+.game-action { display: flex; align-items: center; gap: 8px; margin-top: 16px; color: var(--muted); font-size: 13px; line-height: 1.6; }
+.game-story { display: grid; gap: 24px; list-style: none; padding: 0; margin: 32px 0 0; }
+.game-story > li + li { padding-top: 24px; border-top: 1px solid var(--line); }
+.game-story h3 { color: var(--accent); font-size: 16px; line-height: 1.6; }
+.game-story p { font-size: 16px; color: var(--muted); line-height: 1.8; margin-top: 8px; word-break: keep-all; }
 
 .overview-section { display: grid; grid-template-columns: minmax(0, .85fr) minmax(0, 1.15fr); gap: 64px; align-items: center; }
 .overview-figure { min-width: 0; }
@@ -263,7 +260,7 @@ dialog::backdrop { background: #000c; backdrop-filter: blur(6px); }
 .modal-close span, .image-close span { font-size: 21px; line-height: 1; }
 .modal-close:hover, .image-close:hover { border-color: var(--accent); }
 .modal-body { padding: 32px; overflow-y: auto; overscroll-behavior: contain; }
-#modal[data-mode="capability"] { width: min(720px, calc(100% - 48px)); }
+#modal[data-mode="capability"], #modal[data-mode="game"] { width: min(720px, calc(100% - 48px)); }
 .capability-overview .eyebrow { margin-bottom: 12px; font-size: 13px; letter-spacing: 0; }
 .capability-overview > p:last-child { max-width: 55ch; font-size: 18px; line-height: 1.8; word-break: keep-all; }
 .capability-section { margin-top: 32px; }
@@ -444,7 +441,6 @@ dialog::backdrop { background: #000c; backdrop-filter: blur(6px); }
   .principles { gap: 24px; }
   .principle b, .principle h3 { font-size: 17px; }
   .gamegrid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .game-story { grid-template-columns: 1fr; gap: 24px; }
   .contact-layout { grid-template-columns: 1fr; gap: 32px; }
   .contact-links { width: 100%; }
   .contact-link strong { font-size: 26px; }
@@ -525,8 +521,7 @@ dialog::backdrop { background: #000c; backdrop-filter: blur(6px); }
   .play-history > summary { gap: 8px; }
   .play-history > summary > span { width: 100%; }
   .gamegrid { grid-template-columns: 1fr; }
-  .game > summary { min-height: 155px; padding: 20px; }
-  .inside { padding: 20px; }
+  .game { min-height: 180px; padding: 20px; }
   .overview-section { grid-template-columns: 1fr; gap: 24px; }
   .overview-copy { order: -1; }
   .overview-copy h2 { font-size: 28px; }
@@ -540,7 +535,7 @@ dialog::backdrop { background: #000c; backdrop-filter: blur(6px); }
   footer.wrap { font-size: 12px; gap: 16px; }
   footer p { display: none; }
   dialog { width: calc(100% - 16px); max-height: calc(100dvh - 16px); border-radius: 6px; }
-  #modal[data-mode="capability"] { width: calc(100% - 16px); }
+  #modal[data-mode="capability"], #modal[data-mode="game"] { width: calc(100% - 16px); }
   .modal-shell { max-height: calc(100dvh - 18px); }
   .modal-bar { gap: 16px; padding: 12px 16px; }
   .modal-bar h2 { font-size: 17px; }

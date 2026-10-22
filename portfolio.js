@@ -130,15 +130,7 @@
   html('#profile-facts', `<div class="profile-fact-column"><section class="profile-group"><h3>학력 사항</h3><ol class="profile-timeline">${(profile.education || []).map(item => `<li><span>${escape(item.year)}</span><p>${escape(item.description)}</p></li>`).join('')}</ol></section><section class="profile-group"><h3>보유 역량</h3><dl class="profile-capabilities">${(profile.capabilities || []).map(item => `<div><dt>${escape(item.label)}</dt><dd>${capabilityList(item.value)}</dd></div>`).join('')}</dl><p class="capability-hint">이름을 누르면 활용 내용을 볼 수 있습니다.</p></section></div><div class="profile-fact-column"><section class="profile-group"><h3>프로젝트 이력</h3><ol class="profile-projects">${(profile.projects || []).map(project => `<li><span class="profile-date">${escape(project.period)}</span><a class="profile-project-name" href="#${escape(project.target)}">${escape(project.name)} <span aria-hidden="true">↗</span></a><p>${escape(project.type)}</p>${itemList(project.role, 'role-items profile-role-items')}</li>`).join('')}</ol></section><section class="profile-group"><h3>전시 이력</h3><p class="profile-exhibition"><span class="profile-date">${escape(profile.exhibition?.year)}</span><strong>${escape(profile.exhibition?.description)}</strong><span>${escape(profile.exhibition?.project)}</span></p></section></div>`);
   html('#profile-tools', `<h3>보유 기술</h3><ul>${(profile.tools || []).map(tool => `<li>${capabilityButton(tool)}</li>`).join('')}</ul>`);
   html('#principles', site.principles.map(principle => `<div class="principle"><span>${escape(principle.label)}</span><b>${escape(principle.title)}</b><p>${escape(principle.description)}</p></div>`).join(''));
-  html('#gamegrid', games.map((game, i) => `<details class="game" name="played-games"><summary><small>${number(i + 1)} / ${escape(game.category)}</small><strong>${escape(game.name)}</strong><span>${escape(game.headline)} · ${escape(ui.gameExpand)}</span></summary><div class="inside"><p class="draft-label">${escape(ui.gameNote)}</p><ul class="game-story">${ui.gameLabels.map((label, j) => `<li><b>${escape(label)}</b><p>${escape(game.paragraphs[j])}</p></li>`).join('')}</ul></div></details>`).join(''));
-  // Keep the same behavior in browsers without native exclusive details groups.
-  document.getElementById('gamegrid')?.addEventListener('toggle', event => {
-    const opened = event.target;
-    if (!opened.matches('details.game') || !opened.open) return;
-    document.querySelectorAll('#gamegrid > details.game[open]').forEach(game => {
-      if (game !== opened) game.open = false;
-    });
-  }, true);
+  html('#gamegrid', games.map((game, i) => `<button type="button" class="game" data-game-open="${i}" aria-haspopup="dialog" aria-controls="modal" aria-label="${escape(game.name)} 플레이 경험 보기"><small>${number(i + 1)} / ${escape(game.category)}</small><strong>${escape(game.name)}</strong><span class="game-headline">${escape(game.headline)}</span><span class="game-action">간단히 보기 <span aria-hidden="true">↗</span></span></button>`).join(''));
 
   const contactLinks = [];
   const email = String(assets.contact?.email || '').trim();
@@ -260,6 +252,19 @@
     workDialog.scrollTop = 0;
   }
 
+  function openGame(index, trigger) {
+    const game = games[index];
+    if (!game || !workDialog) return;
+    workDialog.dataset.mode = 'game';
+    workDialog.setAttribute('aria-describedby', 'game-summary');
+    document.querySelector('.modal-close')?.setAttribute('aria-label', '게임 경험 닫기');
+    text('#modal-title', game.name);
+    html('#modal-body', `<div class="game-modal"><div class="capability-overview"><p class="eyebrow">${escape(game.category)}</p><p id="game-summary">${escape(game.headline)}</p></div><ul class="game-story">${ui.gameLabels.map((label, j) => `<li><h3>${escape(label)}</h3><p>${escape(game.paragraphs[j])}</p></li>`).join('')}</ul></div>`);
+    openDialog(workDialog, trigger);
+    document.getElementById('modal-body').scrollTop = 0;
+    workDialog.scrollTop = 0;
+  }
+
   function openMedia(button, trigger = button) {
     if (!imageDialog) return;
     const isVideo = Boolean(button.dataset.videoOpen);
@@ -315,6 +320,8 @@
       }
       return;
     }
+    const gameButton = event.target.closest('[data-game-open]');
+    if (gameButton) { openGame(Number(gameButton.dataset.gameOpen), gameButton); return; }
     const capabilityButton = event.target.closest('[data-capability-open]');
     if (capabilityButton) { openCapability(capabilityButton.dataset.capabilityOpen, capabilityButton); return; }
     const workButton = event.target.closest('[data-work-open]');
