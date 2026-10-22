@@ -85,7 +85,7 @@
   function documentLinks(doc, className = 'doc-actions') {
     const url = safeURL(doc?.url);
     if (!url) return '';
-    return `<div class="${className}"><a class="btn" href="${escape(url)}" target="_blank" rel="noopener noreferrer">PDF 원본 보기 ↗</a><a class="text-link" href="${escape(url)}" download>다운로드 ↓</a></div>`;
+    return `<div class="${className}"><a class="btn" href="${escape(url)}" target="_blank" rel="noopener noreferrer">PDF 원본 보기 ↗</a><a class="text-link" href="${escape(url)}" download="${escape(doc.fileName || '')}">다운로드 ↓</a></div>`;
   }
 
   document.title = site.title;
@@ -106,7 +106,7 @@
   if (overviewSection) overviewSection.hidden = !overviewURL;
   setMedia('#overview-preview', { src: documents.overview?.cover, alt: documents.overview?.title, width: 1280, height: 720 }, '포트폴리오 개요 표지');
   text('#overview-file-meta', `포트폴리오 개요 · PDF · ${documents.overview?.pageCount || 21}쪽`);
-  if (overviewURL) html('#overview-actions', `<a class="btn primary" href="${escape(overviewURL)}" download="서동민_포트폴리오_개요.pdf">개요 PDF 다운로드 <span aria-hidden="true">↓</span></a><a class="text-link" href="${escape(overviewURL)}" target="_blank" rel="noopener noreferrer">PDF 원본 보기 ↗</a>`);
+  if (overviewURL) html('#overview-actions', `<a class="btn primary" href="${escape(overviewURL)}" download="${escape(documents.overview.fileName || '서동민_포폴_개요.pdf')}">개요 PDF 다운로드 <span aria-hidden="true">↓</span></a><a class="text-link" href="${escape(overviewURL)}" target="_blank" rel="noopener noreferrer">PDF 원본 보기 ↗</a>`);
 
   html('#battle-tasks', works.slice(0, 3).map((work, i) => `<article class="task-item"><div class="task-copy"><span class="eyebrow">${escape(work.eyebrow)}</span><h4>${escape(work.title)}</h4><p class="task-subtitle">${escape(work.subtitle)}</p></div><button type="button" class="text-link" data-work-open="${i}">제작 과정 보기 ↗</button></article>`).join(''));
   html('#jump-actions', `<button type="button" class="btn primary" data-work-open="3">기획 과정 보기 ↗</button>`);

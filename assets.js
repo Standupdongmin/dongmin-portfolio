@@ -625,14 +625,16 @@ window.PORTFOLIO_ASSETS = {
   },
   "documents": {
     "overview": {
-      "url": "assets/documents/overview.pdf",
+      "url": "assets/documents/overview.pdf?v=75d7ff8a96fb",
+      "fileName": "서동민_포폴_개요.pdf",
       "cover": "assets/media/overview-cover.webp",
       "title": "서동민 포트폴리오 개요",
       "pageCount": 21,
       "pages": []
     },
     "monster": {
-      "url": "assets/documents/monster-ai.pdf",
+      "url": "assets/documents/monster-ai.pdf?v=aa02e10d7a25",
+      "fileName": "서동민_RPG_일반몬스터_범용_AI.pdf",
       "cover": "assets/media/monster-cover.webp",
       "title": "RPG 일반 몬스터 범용 AI",
       "pageCount": 17,
@@ -658,7 +660,8 @@ window.PORTFOLIO_ASSETS = {
       ]
     },
     "guardian": {
-      "url": "assets/documents/guardian.pdf",
+      "url": "assets/documents/guardian.pdf?v=2c668f8c0efb",
+      "fileName": "서동민_로스트아크_가디언.pdf",
       "cover": "assets/media/guardian-cover.webp",
       "title": "로스트아크 신규 가디언 기획",
       "pageCount": 34,
